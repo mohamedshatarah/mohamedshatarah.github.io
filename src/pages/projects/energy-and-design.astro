@@ -1,0 +1,63 @@
+---
+// Shorter projects. The solar-collector and mechanical-design cards each span two slots.
+import { Image } from 'astro:assets';
+import ProjectLayout from '../../layouts/ProjectLayout.astro';
+import solarEnd from '../../assets/img/solar-end.jpg';
+import solarSection from '../../assets/img/solar-section.jpg';
+import electrolyzer from '../../assets/img/pem-electrolyzer.png';
+import fuelCell from '../../assets/img/pem-fuel-cell.jpg';
+import vortex from '../../assets/img/vortex-paths.jpg';
+import hxMesh from '../../assets/img/hx-mesh.jpg';
+import fanArray from '../../assets/img/cad-fan-array.jpg';
+import rovCad from '../../assets/img/rov-cad.jpg';
+import rovFlow from '../../assets/img/rov-flow.jpg';
+
+const cards = [
+  { wide: true, kicker: 'Freelance', title: 'Evacuated-tube solar collector', images: [
+      { src: solarEnd, alt: 'Structured hexahedral mesh at the closed end of an evacuated solar-collector tube.' },
+      { src: solarSection, alt: 'Structured mesh through the U-tube inside the evacuated tube, with the blocks of the inner and outer regions.' }],
+    text: 'Sunlight heats water in a U-tube inside an evacuated tube. I modeled it with solar ray tracing and the Rosseland radiation model on a fully structured 3D mesh, and compared the results with a published experiment.' },
+  { kicker: 'Freelance', title: 'PEM water electrolyzer', images: [{ src: electrolyzer, alt: 'Current density in a cross-section of a PEM water electrolyzer.' }],
+    text: 'Four months of Ansys Fluent simulations, compared with a published experiment: current density, and the hydrogen, oxygen and water distributions.' },
+  { kicker: 'Freelance', title: 'PEM fuel cell', images: [{ src: fuelCell, alt: 'Current flux density on one periodic unit of a PEM fuel cell.' }],
+    text: 'One periodic unit of the flow field, with fuel at the anode inlet and air at the cathode inlet, simulated in Ansys Fluent.' },
+  { kicker: "Bachelor's degree", title: 'Vortex tube', images: [{ src: vortex, alt: 'Pathlines spiraling along a vortex tube.' }],
+    text: 'The swirling flow that splits compressed air into hot and cold streams, compared with experiments in the university laboratory.' },
+  { kicker: 'Meshing', title: 'Double-pipe heat exchanger', images: [{ src: hxMesh, alt: 'Cross-section of a structured mesh for a double-pipe heat exchanger.' }],
+    text: 'A fully structured mesh for a customized double-pipe heat exchanger, with blocks fitted to each region of the cross-section.' },
+  { wide: true, kicker: 'SOLIDWORKS · CSWA certified, 2020', title: 'Mechanical design', images: [
+      { src: fanArray, alt: 'Rendered CAD model of a fan array: two fans in blue housings, mounted side by side in a frame.' },
+      { src: rovCad, alt: 'CAD assembly of the underwater vehicle.' }],
+    text: "Left: the fan array I designed for Air2O's air-handling units, settled on after trying several designs. Right: the underwater vehicle's assembly." },
+  { kicker: 'Student team · 2021', title: 'Underwater vehicle', images: [{ src: rovFlow, alt: 'Streamlines around an underwater vehicle in a CFD simulation.' }],
+    text: 'With the Robo-Tech team for the MATE Egypt Regional ROV Competition: CFD for lift, drag and center of pressure, and thruster flow in Ansys CFX.' },
+];
+---
+<ProjectLayout
+  title="Hydrogen cells, solar heat and mechanical design"
+  kicker="Energy conversion and design"
+  badges={['Freelance, Air2O and undergraduate projects · 2020 – 2023']}
+  dek="Shorter projects from freelance work, Air2O and my mechanical engineering degree. The electrolyzer, the solar collector and the vortex tube were each compared with experimental data before their results were used."
+  image="/og/energy-and-design.png"
+>
+  <section style="padding-top: 0">
+    <div class="container stack">
+      <div class="cards">
+        {cards.map((c) => (
+          <article class:list={['card', { wide: c.wide }]}>
+            <div class="media" style={`--cols:${c.images.length}`}>
+              {c.images.map((img) => <Image src={img.src} alt={img.alt} widths={[400, 800]} sizes="(max-width: 620px) 100vw, 400px" />)}
+            </div>
+            <div class="body">
+              <p class="kicker">{c.kicker}</p>
+              <h3>{c.title}</h3>
+              <p>{c.text}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+      <div class="idea-box"><p><strong>The range behind the method: flow, heat, electrochemistry and design.</strong></p></div>
+      <p class="caption" style="margin: 0"><strong>Also:</strong> boundary-layer solvers, including thermal boundary layers (coursework), and a user-defined function for a time-varying inlet.</p>
+    </div>
+  </section>
+</ProjectLayout>

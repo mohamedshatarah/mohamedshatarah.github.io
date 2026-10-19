@@ -1,0 +1,152 @@
+---
+// Stormwater case study: the storm explorer, then the problem, the method and the paper.
+import { Image } from 'astro:assets';
+import ProjectLayout from '../../layouts/ProjectLayout.astro';
+import StormExplorer from '../../components/StormExplorer.astro';
+import { site } from '../../data/site';
+import graphicAbstract from '../../assets/stormwater/graphic-abstract.jpg';
+import basinFields from '../../assets/img/basin-fields.jpg';
+
+const title = 'An 18.5-hour transient 3D storm simulation, replayed in 7 seconds';
+const dek =
+  'Can a learned model reproduce unsteady 3D flow and particle transport? Every field-resolved twin depends on the answer. I tested it on a stormwater separator, where every storm is different.';
+
+const stats = [
+  { value: '620', label: 'CFD storm simulations', context: '496 training · 62 validation · 62 test' },
+  { value: '0.99 / 0.93', label: 'R² for velocity / particle concentration', context: 'All 62 unseen storms together, against CFD' },
+  { value: '18.5 h → 7 s', label: 'For one storm, same CPU core', context: '17 ms on one NVIDIA H100 GPU' },
+  { value: '95.2%', label: 'Of unseen storms with velocity R² above 0.8', context: '72.6% for concentration' },
+];
+
+const bibtex = `@article{shatarah2026operator,
+  author  = {Shatarah, Mohamed and Liu, K. and Li, H.},
+  title   = {Operator-based machine learning framework for generalizable prediction
+             of unsteady treatment dynamics in stormwater infrastructure},
+  journal = {Journal of Environmental Engineering},
+  volume  = {152},
+  number  = {9},
+  pages   = {04026047},
+  year    = {2026},
+  doi     = {10.1061/JOEEDU.EEENG-8600}
+}`;
+
+const article = {
+  '@context': 'https://schema.org',
+  '@type': 'ScholarlyArticle',
+  headline: 'Operator-based machine learning framework for generalizable prediction of unsteady treatment dynamics in stormwater infrastructure',
+  author: [{ '@type': 'Person', name: site.name, url: new URL('/', Astro.site).href }, { '@type': 'Person', name: 'K. Liu' }, { '@type': 'Person', name: 'H. Li' }],
+  datePublished: '2026',
+  isPartOf: { '@type': 'Periodical', name: 'Journal of Environmental Engineering' },
+  sameAs: 'https://doi.org/10.1061/JOEEDU.EEENG-8600',
+};
+---
+<ProjectLayout
+  title={title}
+  kicker="Stormwater treatment"
+  badges={['J. Environ. Eng., 2026', 'First author']}
+  dek={dek}
+  image="/og/stormwater.png"
+  jsonLd={article}
+  links={[
+    { label: 'Paper', href: 'https://doi.org/10.1061/JOEEDU.EEENG-8600', icon: 'paper' },
+    { label: 'Open-access preprint', href: 'https://arxiv.org/abs/2507.04682', icon: 'preprint' },
+    { label: 'Code and trained model', href: 'https://github.com/Water-Infrastructure-Laboratory/CPNN', icon: 'code' },
+    { label: 'BibTeX', href: '#cite', icon: 'quote' },
+  ]}
+>
+  <section style="padding-top: 0">
+    <div class="container">
+      <StormExplorer />
+    </div>
+  </section>
+
+  <section class="band" style="padding-block: clamp(40px, 6vw, 72px)">
+    <div class="container">
+      <h2 class="visually-hidden">Results</h2>
+      <ul class="stats">
+        {stats.map((s) => (
+          <li class="stat"><span class="value">{s.value}</span><span class="label">{s.label}</span><span class="context">{s.context}</span></li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="container two-col">
+      <div>
+        <h2>The problem</h2>
+        <p>Hydrodynamic separators take particles out of stormwater. How well one works changes minute by minute through a storm, and resolving that takes an unsteady 3D CFD run: about 18.5 hours per storm on one CPU core, too slow to test a design against many storms.</p>
+        <h2 style="margin-top: 2rem">Where it breaks</h2>
+        <ul>
+          <li>In 4.8% of test storms the concentration prediction was poor: storms whose concentrations sit orders of magnitude below the rest, which a mean-squared-error loss under-weights.</li>
+          <li>In the group's earlier basin study, which I coauthored, the model averaged two physically valid flow states into one that cannot exist.</li>
+        </ul>
+      </div>
+      <div>
+        <h2>What I did</h2>
+        <ul>
+          <li>Developed and evaluated an operator-learning model that predicts velocity and particle concentration anywhere in the separator, at any time in a storm, from five storm parameters.</li>
+          <li>Built it on 620 CFD simulations of one-hour storms (OpenFOAM, unsteady RANS, nine particle classes), run on ISAAC-NG, the University of Tennessee's high-performance computing (HPC) cluster.</li>
+          <li>Combined a multiple-input operator network with a fully connected decoder in PyTorch, tuned over 140 Optuna trials.</li>
+          <li>Used automatic differentiation to map how the 3D field responds to each storm parameter.</li>
+        </ul>
+        <div class="callout" style="margin-top: 1.6rem">
+          <p class="kicker">Decision</p>
+          <p><strong>Check the riskiest piece first.</strong> A twin built on learned models needs them to work for 3D, time-varying flow. My first study asked whether they do, and reported where they fail as well as where they work.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="container">
+      <h2 class="block" style="font-size: 1.3rem; margin-bottom: 1rem">How the model is built</h2>
+      <figure class="figure-block">
+        <div class="paper"><Image src={graphicAbstract} alt="Graphic abstract of the paper. Storm events are described by an inflow curve and a particle-load curve; CFD solutions of many storms are sampled in time and space; the network maps the storm parameters, particle class, time and position to velocity and particle concentration." widths={[800, 1400, 2000]} sizes="(max-width: 1180px) 100vw, 1180px" /></div>
+        <figcaption class="caption">The paper's graphic abstract: how storms, CFD solutions and the network's inputs and outputs fit together.</figcaption>
+      </figure>
+      <div class="strip" style="margin-top: 1.6rem">
+        <p><strong>Computing.</strong> The 620 CFD simulations and the model training ran on ISAAC-NG, the University of Tennessee's high-performance computing (HPC) cluster. Training took about 172 minutes on one NVIDIA H100 GPU.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container stack">
+      <div class="related">
+        <div class="paper"><Image src={basinFields} alt="Velocity components and particle concentration in a stormwater basin: CFD, machine-learning prediction and error side by side." width={440} /></div>
+        <p style="margin: 0"><strong>Where this line of work started.</strong> I coauthored the group's earlier paper in <em>Water Research</em> (2024, with H. Li). It combines physics-informed learning with neural operators to predict flow and particle transport across stormwater basins of different shapes and loads, using a 100,000-case CFD study. <a href="https://doi.org/10.1016/j.watres.2024.121123">Paper</a></p>
+      </div>
+      <div class="callout">
+        <p class="kicker">Open work</p>
+        <p>The trained stormwater separator model and an interactive notebook are public in the <a href="https://github.com/Water-Infrastructure-Laboratory/CPNN">laboratory's repository</a>, so others can run it.</p>
+      </div>
+      <div>
+        <h2 style="font-size: 1.3rem; margin-bottom: 0.8rem">Tools</h2>
+        <ul class="tags"><li>OpenFOAM</li><li>PyTorch</li><li>Optuna</li><li>GPU and HPC</li></ul>
+      </div>
+      <div id="cite">
+        <div class="copy-row">
+          <h2 style="font-size: 1.3rem">Cite</h2>
+          <button class="btn btn-ghost btn-small" type="button" data-copy="bibtex">Copy BibTeX</button>
+        </div>
+        <pre class="bibtex" id="bibtex">{bibtex}</pre>
+      </div>
+    </div>
+  </section>
+</ProjectLayout>
+
+<script>
+  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-copy]')) {
+    button.addEventListener('click', async () => {
+      const text = document.getElementById(button.dataset.copy ?? '')?.textContent ?? '';
+      try {
+        await navigator.clipboard.writeText(text);
+        button.textContent = 'Copied';
+      } catch {
+        button.textContent = 'Select the text to copy';
+      }
+      setTimeout(() => (button.textContent = 'Copy BibTeX'), 2000);
+    });
+  }
+</script>

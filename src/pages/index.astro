@@ -1,0 +1,191 @@
+---
+// Home. No project sits beside the name: the name and headline, the introduction, then every project
+// as an equal card, the Ph.D. research first.
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+import { projects } from '../data/projects';
+import { journalPapers, underReview, talks, markMe, type Paper, type Manuscript } from '../data/publications';
+import CoupledPlant from '../components/diagrams/CoupledPlant.astro';
+
+import stormCfd from '../assets/stormwater/high-cfd.png';
+import basinFields from '../assets/img/basin-fields.jpg';
+import pcmUnit from '../assets/img/pcm-unit-3d.jpg';
+import clarNn from '../assets/img/clar-nn-clean.png';
+import clarCfd from '../assets/img/clar-cfd-clean.png';
+import se3Talk from '../assets/img/se3-talk.jpg';
+
+const thumbs: Record<Paper['thumb'], { src: ImageMetadata; alt: string }> = {
+  storm: { src: stormCfd, alt: 'Particle concentration in the stormwater separator, from CFD.' },
+  basin: { src: basinFields, alt: 'Velocity components and particle concentration in a stormwater basin: CFD, machine-learning prediction and error side by side.' },
+  heat: { src: pcmUnit, alt: 'A cut-away 3D view of the heat-storage unit: a conical shell filled with paraffin around a finned copper tube.' },
+};
+const reviewThumbs: Record<Manuscript['thumb'], { src: ImageMetadata; alt: string }> = {
+  clarNn: { src: clarNn, alt: 'Solids concentration in a clarifier, as the surrogate predicts it.' },
+  clarCfd: { src: clarCfd, alt: 'Solids concentration in a clarifier, from CFD.' },
+};
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  dateModified: '2026-10-18',
+  mainEntity: {
+    '@type': 'Person',
+    name: site.name,
+    description: site.description,
+    email: `mailto:${site.email}`,
+    url: new URL('/', Astro.site).href,
+    affiliation: { '@type': 'CollegeOrUniversity', name: 'University of Tennessee, Knoxville' },
+    alumniOf: [
+      { '@type': 'CollegeOrUniversity', name: 'University of Tennessee, Knoxville' },
+      { '@type': 'CollegeOrUniversity', name: 'Alexandria University' },
+    ],
+    knowsAbout: ['Computational fluid dynamics', 'Scientific machine learning', 'Neural operators', 'Surrogate modeling', 'Coupled systems', 'Digital twins', 'Wastewater treatment', 'Stormwater treatment', 'HVAC', 'Thermal energy storage'],
+    sameAs: [site.links.linkedin, site.links.scholar, site.links.github],
+  },
+};
+---
+<Base title={`${site.name}: simulation, scientific machine learning and digital twins`} description={site.description} jsonLd={jsonLd} home>
+  {/* No project sits beside the name: the name and headline on the left, the introduction on the
+      right, and every project, the Ph.D. research first, as an equal card below. */}
+  <section class="hero hero-text">
+    <div class="container hero-grid">
+      <div>
+        <h1>{site.name}</h1>
+        <p class="tagline">{site.tagline[0]}<br /><em>{site.tagline[1]}</em></p>
+      </div>
+      <div>
+        <p class="intro">{site.intro}</p>
+        <div class="btn-row">
+          <a class="btn" href="#about">About <Icon name="arrow" /></a>
+          <a class="btn btn-ghost" href="/experience/">Experience</a>
+        </div>
+        <ul class="hero-meta">
+          <li><strong>3</strong> journal papers</li>
+          <li><strong>2</strong> manuscripts under review</li>
+          <li><strong>2</strong> awards for presenting research</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects" class="band">
+    <div class="container">
+      <header class="section-head">
+        <p class="kicker">Projects</p>
+        <h2>Simulation, learned models and coupled systems</h2>
+      </header>
+
+      <div class="tiles projects-grid">
+        {projects.map((p) => (
+          <article class:list={['tile', 'is-link', { custom: p.desktopSpan, 'tablet-full': p.tabletFull }]} style={p.desktopSpan ? `--span: ${p.desktopSpan}` : undefined}>
+            {p.diagram === 'coupled-plant' ? (
+              <div class="tile-media plant">
+                <figure>
+                  <CoupledPlant uid="card" />
+                  <figcaption><strong>The coupled plant.</strong> Five biological reactors pass feed solids to the clarifier, drawn as the solids field the neural network predicts; return sludge flows back to the first reactor.</figcaption>
+                </figure>
+              </div>
+            ) : p.thumbs ? (
+              <div class:list={['tile-media', 'pair', { one: p.thumbs.length === 1 }]}>
+                {p.thumbs.map((t, _i, all) => <figure><Image src={t.src} alt={t.alt} widths={[300, 600]} sizes={all.length === 1 ? '(max-width: 620px) 100vw, 380px' : '(max-width: 620px) 50vw, 190px'} /><figcaption>{t.label}</figcaption></figure>)}
+              </div>
+            ) : (
+              <div class:list={['tile-media', { cover: p.cover }]}>{p.thumb && <Image src={p.thumb} alt={p.thumbAlt ?? ''} widths={[400, 800]} sizes="(max-width: 620px) 100vw, 380px" />}</div>
+            )}
+            <div class="tile-body">
+              <p class="kicker">{p.kicker}</p>
+              <h3>{p.title}</h3>
+              <p>{p.summary}</p>
+              <a class="tile-link" href={p.href}>{p.linkLabel ?? 'Read more'} <span aria-hidden="true">→</span></a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section id="publications">
+    <div class="container">
+      <header class="section-head">
+        <p class="kicker">Record</p>
+        <h2>Publications</h2>
+      </header>
+      <h3 class="subhead">Journal papers</h3>
+      <ol class="papers">
+        {journalPapers.map((p) => (
+          <li class:list={['paper-row', { highlight: p.highlight }]}>
+            <div class="paper paper-thumb"><Image src={thumbs[p.thumb].src} alt={thumbs[p.thumb].alt} width={320} /></div>
+            <div>
+              <h3>{p.title}</h3>
+              <p class="authors" set:html={`${markMe(p.authors)} (${p.year})`} />
+              <p class="venue"><em>{p.venue}</em></p>
+              {p.note && <p class="note">{p.note}</p>}
+              <ul class="paper-links">{p.links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <h3 class="subhead" id="under-review">Manuscripts under review</h3>
+      <ol class="papers">
+        {underReview.map((m) => (
+          <li class="paper-row">
+            <div class="paper paper-thumb"><Image src={reviewThumbs[m.thumb].src} alt={reviewThumbs[m.thumb].alt} width={320} /></div>
+            <div>
+              <h3>{m.title}</h3>
+              <p class="authors" set:html={markMe(m.authors)} />
+              <p class="venue badges"><span class="badge badge-quiet">Under review</span>{m.award && <span class="badge">{m.award}</span>}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <details class="more">
+        <summary>Conference presentations ({talks.length})</summary>
+        <ol>
+          {talks.map((t) => <li><span set:html={markMe(t.authors)} /> ({t.year}). <b>{t.title}.</b> {t.where}</li>)}
+        </ol>
+      </details>
+    </div>
+  </section>
+
+  <section id="about" class="band">
+    <div class="container about-grid">
+      <div>
+        <h2>About</h2>
+        {/* The rest of the profile, in first person. Its first sentence opens the page under the name;
+            the full profile heads the Experience page. */}
+        <p class="lead" style="margin-top: 1rem">I build CFD models, train neural-operator surrogates on the simulated fields, and couple them into differentiable system-level models, working toward digital twins connected to live measurements and control.</p>
+        <p class="lead">My industry CFD experience covers heating, ventilation and air-conditioning (HVAC) equipment, cleanrooms, solar collectors, fuel cells and electrolyzers.</p>
+
+        <h3 class="subhead">Experience</h3>
+        <ul class="facts">
+          <li><b>Graduate Research Assistant, University of Tennessee, Knoxville</b><span>August 2023 – present · Research in flow and particle transport, neural surrogates and coupled activated-sludge models.</span></li>
+          <li><b>Research and Development Engineer, Air2O</b><span>December 2021 – July 2023 · Used CFD to guide HVAC designs and evaluate cooling technologies; prepared commercial air-conditioning layouts in AutoCAD.</span></li>
+          <li><b>Part-time Freelance CFD Engineer, independent clients and Upwork</b><span>2021 – 2023 · Airflow and thermal simulations for cleanrooms, fuel cells, electrolyzers and evacuated-tube solar collectors.</span></li>
+          <li><b>Undergraduate Researcher, Alexandria University</b><span>July 2020 – July 2021 · Numerical and thermal engineering work, including C++ mesh-generation algorithms under Dr. Mohamed S. Ebeida, research scientist at Sandia National Laboratories.</span></li>
+        </ul>
+        <a class="btn btn-ghost" href="/experience/">Full experience, teaching and leadership <Icon name="arrow" /></a>
+      </div>
+      <div>
+        <h3 class="subhead" style="margin-top: 0">Education</h3>
+        <ul class="facts">
+          <li><b>Ph.D., Civil Engineering (Water Resources Engineering)</b><span>University of Tennessee, Knoxville · expected May 2027</span></li>
+          <li><b>M.S., Environmental Engineering (Water Resources)</b><span>University of Tennessee, Knoxville · expected December 2026</span></li>
+          <li><b>B.S., Mechanical Engineering</b><span>Alexandria University, Egypt · July 2021</span></li>
+        </ul>
+        <h3 class="subhead">Recognition</h3>
+        <ul class="facts">
+          <li><b>Best Presentation Award</b><span>SouthEastern Environmental Engineering Conference (SE3), 2026</span></li>
+          <li><b>First Prize, Student Poster Competition</b><span>ISSE Research Conference, 2024</span></li>
+          <li><b>Graduate Fellowship Award</b><span>University of Tennessee, 2023</span></li>
+          <li><b>Certified SOLIDWORKS Associate (CSWA)</b><span>Mechanical Design, 2020</span></li>
+        </ul>
+        <figure class="photo">
+          <Image src={se3Talk} alt="Mohamed presenting at the SE3 2026 conference in Atlanta, beside a screen that compares a process simulation with a CFD simulation of the clarifier." width={800} />
+          <figcaption class="caption">Presenting at SE3 2026 in Atlanta; the talk received the Best Presentation Award.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+</Base>

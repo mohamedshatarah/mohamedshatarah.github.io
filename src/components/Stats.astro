@@ -1,0 +1,10 @@
+---
+// Stat tiles: value, label, context (value in the same sans, proportional figures).
+interface Props { items: { value: string; label: string; context?: string }[] }
+const { items } = Astro.props;
+---
+<ul class="stats">
+  {items.map((s) => (
+    <li class="stat"><span class="value">{s.value}</span><span class="label">{s.label}</span>{s.context && <span class="context">{s.context}</span>}</li>
+  ))}
+</ul>

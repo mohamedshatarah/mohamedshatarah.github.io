@@ -1,0 +1,87 @@
+---
+// Numerical methods: DNS, two flow solvers, computing at scale and the C++ mesh generator.
+import ProjectLayout from '../../layouts/ProjectLayout.astro';
+import Diagram from '../../components/Diagram.astro';
+import Figure from '../../components/Figure.astro';
+import meshVoronoi from '../../assets/img/mesh-voronoi.jpg';
+import meshCircle from '../../assets/img/mesh-circle.jpg';
+import { projects } from '../../data/projects';
+
+const summary = projects.find((p) => p.href === '/projects/numerical-methods/')!.summary;
+---
+<ProjectLayout
+  title="Below the surrogates: turbulence, solvers, meshes and computing"
+  kicker="How I work"
+  badges={['Course projects and OpenFOAM studies · 2020 – 2025']}
+  dek={summary}
+  image="/og/numerical-methods.png"
+>
+  <section style="padding-top: 0">
+    <div class="container stack">
+      <figure class="figure-block">
+        <div class="paper" style="padding: 14px"><img class="chart" src="/charts/channel-dns.svg" width="1576" height="417" loading="lazy" alt="Two panels. Left: streamwise velocity at one instant on a plane parallel to the wall, 15 wall units above it, shown as faster (red) or slower (blue) than the plane's average. Long fast and slow streaks run in the flow direction across the whole box. Right: mean velocity against distance from the wall, both in wall units, on a logarithmic axis, close to the reference points of Kim, Moin and Moser." /></div>
+      </figure>
+      <div class="split">
+        <div>
+          <p class="kicker">OpenFOAM · July 2025</p>
+          <h2>Direct numerical simulation (DNS) of turbulent channel flow</h2>
+          <p>No turbulence model: the turbulence itself is resolved on 3.93 million cells, at a friction Reynolds number near 180. Left: near-wall streaks that a turbulence model averages away. Right: the mean velocity profile against the DNS of Kim, Moin and Moser (1987).</p>
+        </div>
+        <div class="idea-box"><p><strong>Why it matters for the surrogates.</strong> The learned models on this site are only as good as the CFD they learn from; this is the resolution end of that CFD.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="container fig-row">
+      <div class="stack" style="gap: 14px">
+        <figure class="figure-block">
+          <div class="paper" style="padding: 12px"><img class="chart" src="/charts/cylinder-wake.svg" width="1020" height="570" loading="lazy" alt="Vorticity behind a circular cylinder at Reynolds number 100: blue and red vortices peel off alternately from the top and bottom of the cylinder and drift downstream in a staggered row. Below it, vorticity at a point just behind the cylinder oscillates as a regular wave, about six and a half cycles in 40 time units." /></div>
+        </figure>
+        <p class="kicker" style="margin: 0">CFD course · April 2025 · MATLAB</p>
+        <h3>Vortex shedding behind a cylinder</h3>
+        <p>Unsteady 2D Navier–Stokes in vorticity–streamfunction form on a body-fitted 181 × 181 grid, with implicit time steps and Newton-type inner iterations. At Re = 100 the wake sheds vortices at a Strouhal number of 0.16.</p>
+      </div>
+      <div class="stack" style="gap: 14px">
+        <figure class="figure-block">
+          <div class="paper" style="padding: 12px"><img class="chart" src="/charts/cavity.svg" width="1020" height="570" loading="lazy" alt="Left: the flow in a square cavity whose lid moves to the right, at Reynolds number 400. Streamlines show one large vortex and two small eddies in the bottom corners; color shows speed, highest under the lid. Right: horizontal velocity along the vertical line at mid-width for Reynolds numbers 100 and 400; seventeen benchmark points from Ghia and co-authors lie on the Reynolds 400 curve." /></div>
+        </figure>
+        <p class="kicker" style="margin: 0">CFD course · Feb – Mar 2025 · MATLAB, Python</p>
+        <h3>Lid-driven cavity, solved two ways</h3>
+        <p>A semi-implicit solver, then a fully implicit one solving streamfunction and vorticity together by Newton's method. At Re = 400 on a 257 × 257 grid, horizontal velocity matches Ghia et al. (1982) to within 0.2% of the lid speed. My reports record run time falling from over six hours to minutes.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container stack">
+      <div class="split reverse">
+        <figure class="figure-block">
+          <div class="paper" style="padding: 14px"><Diagram name="dakota-loop" label="Diagram of a loop. Dakota draws 5,000 samples, shown as a square filled evenly with dots. A script writes a mesh and boundary conditions for each sample. OpenFOAM solves heat conduction in a slab with heat entering at one end and cooling at the other. One temperature per case goes back to Dakota. 24 cases run at a time, and 5,000 cases take about 10 minutes." /></div>
+        </figure>
+        <div>
+          <p class="kicker">ISAAC-NG · Slurm · Dakota</p>
+          <h2>Computing at scale</h2>
+          <p>My Ph.D. simulations ran as batch jobs on ISAAC-NG, the university's cluster, among them the 620 transient 3D storm simulations behind the stormwater model.</p>
+          <p>In an October 2023 study, Dakota drew 5,000 Latin-hypercube samples of three inputs to a heat-conduction model: inlet temperature gradient, ambient temperature and length. A script built and ran one OpenFOAM case per sample, 24 at a time, and sent a temperature back.</p>
+        </div>
+      </div>
+      <div class="split">
+        <div>
+          <p class="kicker">C++ · undergraduate research · Alexandria University · 2020 – 2021</p>
+          <h2>A 2D mesh generator in C++</h2>
+          <p>Implemented maximal Poisson-disk sampling, Voronoi cells and Delaunay triangulation, with a kd-tree for point searches, to generate 2D meshes from points on the part and domain boundaries. Supervised by Dr. Mohamed S. Ebeida, a research scientist at Sandia National Laboratories.</p>
+        </div>
+        <Figure cols={2} images={[
+          { src: meshVoronoi, alt: 'An unstructured mesh of Voronoi cells around a lobed shape, with a refined band along the boundary.' },
+          { src: meshCircle, alt: 'A Voronoi mesh of a rectangular domain containing a circular body.' },
+        ]} />
+      </div>
+      <p class="caption" style="margin: 0"><strong>Also:</strong> turbulent pipe flow at Re = 37,700 with the k-ω SST model, converged in 1,589 iterations (OpenFOAM, 2024) · a marching solver for the flat-plate boundary layer, its thickness and skin friction within 0.3% of Blasius (MATLAB, 2025).</p>
+      <div>
+        <h2 style="font-size: 1.3rem; margin-bottom: 0.8rem">Tools</h2>
+        <ul class="tags"><li>OpenFOAM</li><li>MATLAB</li><li>Python</li><li>C++</li><li>Dakota</li><li>ISAAC-NG (Slurm)</li></ul>
+      </div>
+    </div>
+  </section>
+</ProjectLayout>

@@ -1,0 +1,209 @@
+---
+// Experience, from the CV.
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import { site } from '../data/site';
+import { underReview } from '../data/publications';
+import teachingClass from '../assets/img/teaching-class.jpg';
+
+type Item = { title: string; status?: string; href?: string; bullets: string[] };
+type Role = { when: string; title: string; where: string; lines?: { name: string; href?: string; note?: string; items: Item[] }[]; bullets?: string[]; href?: string; hrefLabel?: string };
+
+const research: Role[] = [
+  {
+    when: 'August 2023 – present', title: 'Graduate Research Assistant', where: 'University of Tennessee, Knoxville · Water Infrastructure Laboratory, Department of Civil and Environmental Engineering',
+    lines: [
+      {
+        // Under review: titles only, until the manuscripts are published.
+        name: 'Toward a digital twin of a wastewater treatment plant',
+        note: 'Two first-author manuscripts under review; details will follow publication.',
+        items: underReview.map((m) => ({ title: m.title, status: 'Under review', bullets: [] })),
+      },
+      {
+        name: 'Learned models of stormwater treatment units',
+        items: [
+          { title: 'Transient three-dimensional (3D) flow in a separator', status: 'Journal of Environmental Engineering', href: '/projects/stormwater/', bullets: [
+            'Developed an operator-learning model, a multiple-input operator network (MIONet) encoder with a fully connected decoder in PyTorch, that predicts velocity and particle concentration anywhere in a hydrodynamic separator, at any time during a storm, from five storm-loading parameters.',
+            'Trained it on 620 transient 3D OpenFOAM simulations run on ISAAC-NG, using unsteady Reynolds-averaged Navier-Stokes (URANS) turbulence modeling and nine particle classes; on 62 unseen storms, R² was 0.99 for velocity and 0.93 for particle concentration against CFD.',
+            'Replays an 18.5-hour CFD storm simulation in about 7 seconds on the same processor core; used automatic differentiation to map how the 3D concentration field responds to each storm parameter.',
+          ] },
+          { title: 'Physics-informed operator learning for clarification basins', status: 'Water Research', bullets: [
+            'Coauthored a study pairing a deep operator network (DeepONet) encoder with a physics-informed decoder to predict depth-averaged velocity and particle-concentration fields across basin geometries and loads, trained on a 100,000-case CFD database.',
+          ] },
+        ],
+      },
+    ],
+  },
+  {
+    when: 'July 2020 – July 2021', title: 'Undergraduate Researcher', where: 'Alexandria University, Egypt',
+    lines: [{
+      name: '', items: [
+        { title: 'Two-dimensional (2D) mesh generator in C++', href: '/projects/numerical-methods/', bullets: [
+          'Implemented structured and unstructured 2D mesh generation from boundary points using maximal Poisson-disk sampling, Voronoi cells and Delaunay triangulation, with a kd-tree for spatial search, under the supervision of Dr. Mohamed S. Ebeida (research scientist, Sandia National Laboratories).',
+        ] },
+        { title: 'Fin design for a phase-change thermal energy store', status: 'Journal of Energy Storage', href: '/projects/heat-storage/', bullets: [
+          'Contributed the Ansys Fluent modeling, the validation against a published experiment (largest temperature deviation 4.1%) and manuscript drafting for a study of 20 fin designs in a conical latent-heat storage unit.',
+          'The study predicted a 42.6% shorter total melting time for 20 mm versus 5 mm fins at a +30° fin angle.',
+        ] },
+      ],
+    }],
+  },
+];
+
+const industry: Role[] = [
+  {
+    when: 'December 2021 – July 2023', title: 'Research and Development Engineer', where: 'Air2O', href: '/projects/air2o-hvac/', hrefLabel: 'The Air2O project page',
+    bullets: [
+      'Used Ansys CFD to guide HVAC designs and evaluate cooling technologies; the improved designs were predicted in simulation to cut energy consumption by 31%.',
+      'Modeled an air-handling unit moving 69,800 cubic feet of air per minute in Ansys Fluent, with its eight cooling coils as porous media and its fans as pressure-jump surfaces (1.8-million-element half model, chosen by a mesh study).',
+      'Designed fan arrays for the air-handling units in SOLIDWORKS, iterating through several designs.',
+      'Simulated cleanroom airflow to support contaminant-removal design decisions; designed centralized air-conditioning systems for commercial facilities and prepared their AutoCAD layouts.',
+    ],
+  },
+  {
+    when: '2021 – 2023', title: 'Part-time Freelance CFD Engineer', where: 'Independent clients and Upwork', href: '/projects/energy-and-design/', hrefLabel: 'The energy and design projects',
+    bullets: [
+      'Simulated airflow and temperature in two university laboratory cleanrooms to evaluate ventilation and thermal behavior.',
+      'Modeled a proton-exchange-membrane (PEM) water electrolyzer in Ansys Fluent over four months (electrochemical reactions, current density, and hydrogen, oxygen and water distributions) and compared the results with a published experiment; also modeled a PEM fuel cell.',
+      'Modeled an evacuated-tube solar collector with solar ray tracing and the Rosseland radiation model on a structured 3D mesh, and compared the results with a published experiment.',
+    ],
+  },
+];
+
+const teaching: Role[] = [
+  { when: '2023 – 2024', title: 'Teaching Assistant', where: 'University of Tennessee, Knoxville', bullets: ['Environmental Transport and Kinetics (ENVE 512), Fall 2024; Environmental Engineering I; Professional Development II (CE 305), Fall 2023.'] },
+  { when: 'Summer 2024', title: 'Undergraduate Research Mentor', where: 'Rocky Top Research Coaches, University of Tennessee', bullets: [] },
+  { when: 'July – December 2021', title: 'Ansys CFD Instructor', where: 'Ansys and Fluent fundamentals for undergraduate students', bullets: [] },
+];
+
+const leadership: Role[] = [
+  { when: '2024 – present', title: 'Founder and President', where: 'Arab Students Association, University of Tennessee', bullets: ['Founded a community where Arab students celebrate their culture and support one another.', 'Organize social events such as movie nights, group dinners and gatherings in the park.'] },
+  { when: '2026 – present', title: 'President', where: 'Vol Tango Club, University of Tennessee', bullets: ['Arranged with the university for experienced instructors to teach free tango classes to students.'] },
+  { when: '2024 – 2026', title: 'Graduate Student Senator', where: 'University of Tennessee', bullets: ['Represented the Department of Civil and Environmental Engineering in the Graduate Student Senate.'] },
+];
+
+const awards = [
+  { when: '2026', title: 'Best Presentation Award', where: 'SouthEastern Environmental Engineering Conference (SE3)' },
+  { when: '2024', title: 'First Prize, Student Poster Competition', where: 'ISSE Research Conference, University of Tennessee' },
+  { when: '2023', title: 'University of Tennessee Graduate Fellowship Award', where: '' },
+  { when: '2021', title: 'Third Place, MATE ROV Underwater Robot Middle East Competition', where: 'Robo-Tech undergraduate team' },
+  { when: 'July 2020', title: 'Certified SOLIDWORKS Associate (CSWA)', where: 'Mechanical Design, Dassault Systèmes' },
+];
+
+const skills = [
+  { name: 'Scientific machine learning', text: 'PyTorch, JAX, deep learning, neural operators (DeepONet, MIONet), physics-informed neural networks (PINNs), surrogate and reduced-order modeling, automatic and implicit differentiation, sensitivity analysis, Optuna, graphics processing unit (GPU) training.' },
+  { name: 'CFD and multiphysics', text: 'OpenFOAM, Ansys Fluent, Ansys CFX, Reynolds-averaged Navier-Stokes (RANS and URANS) turbulence modeling, direct numerical simulation (DNS), multiphase and drift-flux models, particle transport, heat transfer and phase change, radiation, preCICE coupling, structured and unstructured meshing.' },
+  { name: 'Programming and computing', text: 'Python, C++, MATLAB, Linux HPC clusters with Slurm batch jobs, Dakota.' },
+  { name: 'Process modeling', text: 'Activated Sludge Model No. 1 (ASM1), Benchmark Simulation Model No. 1 (BSM1), plant-wide wastewater treatment modeling.' },
+  { name: 'Computer-aided design (CAD)', text: 'SOLIDWORKS, AutoCAD.' },
+];
+---
+<Base title={`Experience | ${site.name}`} description="Research, industry, teaching and leadership experience of Mohamed Shatarah, from his CV.">
+  <section class="page-hero">
+    <div class="container">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> / Experience</nav>
+      <p class="kicker">Experience</p>
+      <h1>Research, industry, teaching and leadership</h1>
+      <p class="dek">Mechanical engineer completing a Ph.D. in civil engineering, combining computational fluid dynamics (CFD), scientific machine learning and high-performance computing (HPC) to support design and control decisions in engineering systems. Builds CFD models, trains neural-operator surrogates on the simulated fields, and couples them into differentiable system-level models, working toward digital twins connected to live measurements and control. Industry CFD experience with heating, ventilation and air-conditioning (HVAC) equipment, cleanrooms, solar collectors, fuel cells and electrolyzers. Three journal articles and two first-author manuscripts under review.</p>
+      <div class="btn-row" style="margin-top: 1.4rem">
+        <a class="btn" href={`mailto:${site.email}`}>Email</a>
+        <a class="btn btn-ghost" href="/#publications">Publications</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="tight" style="padding-top: 0">
+    <div class="container">
+      <h2 class="subhead" style="margin-top: 0">Education</h2>
+      <ul class="timeline">
+        <li><span class="when">Expected May 2027</span><div><h3>Ph.D., Civil Engineering (Water Resources Engineering)</h3><p class="where">University of Tennessee, Knoxville</p></div></li>
+        <li><span class="when">Expected December 2026</span><div><h3>M.S., Environmental Engineering (Water Resources)</h3><p class="where">University of Tennessee, Knoxville</p></div></li>
+        <li><span class="when">July 2021</span><div><h3>B.S., Mechanical Engineering</h3><p class="where">Alexandria University, Egypt</p></div></li>
+      </ul>
+
+      <h2 class="subhead">Research experience</h2>
+      <ul class="timeline">
+        {research.map((role) => (
+          <li>
+            <span class="when">{role.when}</span>
+            <div>
+              <h3>{role.title}</h3>
+              <p class="where">{role.where}</p>
+              {role.lines?.map((line) => (
+                <>
+                  {line.name && <p class="line-head" style="font-size: 1.02rem">{line.href ? <a href={line.href}>{line.name}</a> : line.name}</p>}
+                  {line.items.map((item) => (
+                    <>
+                      <p class="line-head">{item.title}{item.status && <span class="badge badge-quiet">{item.status}</span>}{item.href && <a href={item.href}>Project page →</a>}</p>
+                      {item.bullets.length > 0 && <ul>{item.bullets.map((b) => <li>{b}</li>)}</ul>}
+                    </>
+                  ))}
+                  {line.note && <p class="line-note">{line.note}</p>}
+                </>
+              ))}
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      <h2 class="subhead">Industry experience</h2>
+      <ul class="timeline">
+        {industry.map((role) => (
+          <li>
+            <span class="when">{role.when}</span>
+            <div>
+              <h3>{role.title}</h3>
+              <p class="where">{role.where}{role.href && <> · <a href={role.href}>{role.hrefLabel} →</a></>}</p>
+              <ul>{role.bullets?.map((b) => <li>{b}</li>)}</ul>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  {/* The classroom photo sits beside the teaching list; the lower sections use half the usual
+      vertical spacing (class "tight"). */}
+  <section class="band tight">
+    <div class="container split teaching-row">
+      <div>
+        <h2 class="subhead" style="margin-top: 0">Teaching and mentoring</h2>
+        <ul class="timeline">
+          {teaching.map((role) => (
+            <li><span class="when">{role.when}</span><div><h3>{role.title}</h3><p class="where">{role.where}</p>{role.bullets && role.bullets.length > 0 && <ul>{role.bullets.map((b) => <li>{b}</li>)}</ul>}</div></li>
+          ))}
+        </ul>
+      </div>
+      <figure class="photo">
+        <Image src={teachingClass} alt="Mohamed at the front of a classroom, beside a screen headed Design Criteria for Small to Medium-Sized Plants; students smile and give a thumbs up." widths={[480, 960]} sizes="(max-width: 900px) 100vw, 480px" />
+        <figcaption class="caption">Teaching Environmental Engineering I.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="tight">
+    <div class="container">
+      <h2 class="subhead" style="margin-top: 0">Leadership and service</h2>
+      <ul class="timeline">
+        {leadership.map((role) => (
+          <li><span class="when">{role.when}</span><div><h3>{role.title}</h3><p class="where">{role.where}</p><ul>{role.bullets?.map((b) => <li>{b}</li>)}</ul></div></li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="band tight">
+    <div class="container stack">
+      <div>
+        <h2 class="subhead" style="margin-top: 0">Awards and certification</h2>
+        <ul class="timeline">
+          {awards.map((a) => <li><span class="when">{a.when}</span><div><h3>{a.title}</h3>{a.where && <p class="where">{a.where}</p>}</div></li>)}
+        </ul>
+      </div>
+      <div>
+        <h2 class="subhead" style="margin-top: 0">Technical skills</h2>
+        <ul class="skills">{skills.map((s) => <li><b>{s.name}</b><span>{s.text}</span></li>)}</ul>
+      </div>
+    </div>
+  </section>
+</Base>

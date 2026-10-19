@@ -1,0 +1,54 @@
+---
+// Shared frame for every project page: breadcrumb, kicker with badges, title, dek, links bar,
+// the page body, and previous / next links in reading order.
+import Base from './Base.astro';
+import Icon from '../components/Icon.astro';
+import { sequence } from '../data/projects';
+import { site } from '../data/site';
+
+interface Link { label: string; href: string; icon?: 'paper' | 'preprint' | 'code' | 'quote' | 'file' }
+interface Props {
+  title: string;
+  kicker: string;
+  dek: string;
+  badges?: string[];
+  links?: Link[];
+  crumbs?: { label: string; href: string }[];
+  image?: string;
+  jsonLd?: Record<string, unknown>;
+}
+const { title, kicker, dek, badges = [], links = [], crumbs = [], image, jsonLd } = Astro.props;
+const here = Astro.url.pathname.endsWith('/') ? Astro.url.pathname : `${Astro.url.pathname}/`;
+const index = sequence.findIndex((p) => p.href === here);
+const previous = index > 0 ? sequence[index - 1] : undefined;
+const next = index >= 0 && index < sequence.length - 1 ? sequence[index + 1] : undefined;
+---
+<Base title={`${title} | ${site.name}`} description={dek} image={image} type="article" jsonLd={jsonLd}>
+  <section class="page-hero">
+    <div class="container">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a> / <a href="/#projects">Projects</a>
+        {crumbs.map((c) => <> / <a href={c.href}>{c.label}</a></>)}
+      </nav>
+      <p class="kicker">{kicker}{badges.map((b) => <span class="badge">{b}</span>)}</p>
+      <h1>{title}</h1>
+      <p class="dek">{dek}</p>
+      {links.length > 0 && (
+        <ul class="linkbar">
+          {links.map((l) => <li><a href={l.href}>{l.icon && <Icon name={l.icon} />} {l.label}</a></li>)}
+        </ul>
+      )}
+    </div>
+  </section>
+
+  <slot />
+
+  <section class="page-end">
+    <div class="container">
+      <nav class="next-nav" aria-label="More projects">
+        {previous ? <a href={previous.href}><small>Previous</small><span>{previous.title}</span></a> : <a href="/#projects"><small>Back</small><span>All projects</span></a>}
+        {next ? <a class="to-next" href={next.href}><small>Next</small><span>{next.title}</span></a> : <a class="to-next" href="/#projects"><small>Back</small><span>All projects</span></a>}
+      </nav>
+    </div>
+  </section>
+</Base>

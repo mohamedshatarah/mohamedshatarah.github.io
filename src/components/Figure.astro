@@ -1,0 +1,15 @@
+---
+// A figure on a white "paper" card: one or more images side by side (or a diagram in the slot),
+// with a caption underneath. Captions may hold <strong> for the lead phrase.
+import { Image } from 'astro:assets';
+interface Item { src: ImageMetadata; alt: string }
+interface Props { images?: Item[]; caption?: string; cols?: number; tight?: boolean; max?: number }
+const { images = [], caption, cols = images.length || 1, tight = false, max } = Astro.props;
+---
+<figure class="figure-block" style={max ? `max-width: ${max}px; margin-inline: auto; width: 100%` : undefined}>
+  <div class:list={['paper', 'fig-grid', { tight }]} style={`--cols:${cols}`}>
+    {images.map((item) => <Image src={item.src} alt={item.alt} widths={[480, 960, Math.min(item.src.width, 1600)]} sizes="(max-width: 900px) 100vw, 900px" />)}
+    <slot />
+  </div>
+  {caption && <figcaption class="caption" set:html={caption} />}
+</figure>

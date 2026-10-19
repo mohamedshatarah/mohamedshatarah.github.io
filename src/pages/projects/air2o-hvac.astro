@@ -1,0 +1,77 @@
+---
+// Air2O: CFD for HVAC design, the air-handling unit, the fan array and the cleanrooms.
+import ProjectLayout from '../../layouts/ProjectLayout.astro';
+import Figure from '../../components/Figure.astro';
+import Stats from '../../components/Stats.astro';
+import ahuGeometry from '../../assets/img/ahu-geometry.png';
+import ahuMesh from '../../assets/img/ahu-mesh.png';
+import ahuVelocity from '../../assets/img/ahu-velocity.png';
+import ahuPressure from '../../assets/img/ahu-pressure.png';
+import fanArray from '../../assets/img/cad-fan-array.jpg';
+import cleanVelocity from '../../assets/img/clean-velocity.jpg';
+import cleanTemperature from '../../assets/img/clean-temperature.jpg';
+import cleanTemperature2 from '../../assets/img/clean-temperature-2.jpg';
+---
+<ProjectLayout
+  title="Using CFD to cut the predicted energy use of HVAC designs by 31%"
+  kicker="HVAC · Air2O"
+  badges={['R&D engineer · 2021 – 2023']}
+  dek="At Air2O I used CFD to guide HVAC and cleanroom designs. The improved designs and cooling technologies cut energy consumption by 31% in simulation."
+  image="/og/air2o-hvac.png"
+>
+  <section style="padding-top: 0">
+    <div class="container split">
+      <div>
+        <h2 style="font-size: 1.3rem; margin-bottom: 0.8rem">At Air2O · December 2021 – July 2023</h2>
+        <ul>
+          <li>Improved HVAC designs and evaluated cooling technologies for energy-efficient operation.</li>
+          <li>Designed fan arrays for the air-handling units in SOLIDWORKS, iterating through several designs.</li>
+          <li>Ran Ansys CFD analyses of HVAC units and cleanrooms to assess airflow and support contaminant-removal design decisions.</li>
+          <li>Designed centralized air-conditioning systems for commercial facilities and prepared the AutoCAD layouts.</li>
+        </ul>
+      </div>
+      <Stats items={[{ value: '31%', label: 'lower energy consumption', context: 'simulation-predicted, for the improved designs and cooling technologies; not a measured saving' }]} />
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="container stack">
+      <div class="split">
+        <div>
+          <h2>Case study: a 69,800-cfm air-handling unit</h2>
+          <p>The unit holds eight cooling coils, piping and fans, and moves 69,800 cfm. Meshing every coil fin was out of reach, so I replaced detail with physics:</p>
+          <ul>
+            <li>Coils became porous zones, with resistance set from Darcy's law and experimental data. Fans became pressure-jump surfaces.</li>
+            <li>A symmetry plane halved the domain. It was split into nine subdomains, eight of them meshed with structured cells.</li>
+            <li>A mesh study starting from 2.8 million elements settled on 1.8 million. Turbulence model: SST k-ω, at Re = 3.26 × 10⁶.</li>
+          </ul>
+        </div>
+        <Figure cols={2} images={[
+          { src: ahuGeometry, alt: "The unit's coils, piping and base in a CAD view." },
+          { src: ahuMesh, alt: 'The half-domain mesh: structured blocks around the coils and an unstructured inlet region.' },
+          { src: ahuVelocity, alt: 'Velocity contours on the symmetry plane: air accelerates through the fan opening into the outlet duct.' },
+          { src: ahuPressure, alt: 'Pressure contours on the symmetry plane: the pressure drops across the coils.' },
+        ]} caption="<strong>Geometry, mesh, velocity and pressure.</strong> The coils sit at the left; air leaves through the long duct. Color scales: velocity 0 to 16.7 m/s, pressure −249 to 1,234 Pa." />
+      </div>
+      <div class="split reverse">
+        <Figure images={[{ src: fanArray, alt: 'Rendered CAD model of a fan array: two fans in blue housings, mounted side by side in a frame.' }]}
+          caption="<strong>The fan array I designed for Air2O's air-handling units</strong> in SOLIDWORKS, settled on after trying several designs." />
+        <div class="idea-box"><p><strong>Resolving pays off when the model is checked against measurements before designs are compared.</strong></p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cleanrooms">
+    <div class="container stack">
+      <Figure cols={3} images={[
+        { src: cleanVelocity, alt: 'Velocity vectors in a laboratory cleanroom: air enters through ceiling filter units and leaves through wall grilles.' },
+        { src: cleanTemperature, alt: 'Air temperature at the exhaust openings of the first cleanroom.' },
+        { src: cleanTemperature2, alt: 'Air temperature at the exhaust openings of the second, larger cleanroom.' },
+      ]} caption="<strong>Freelance: two university laboratory cleanrooms.</strong> Airflow and temperature simulated to evaluate ventilation and thermal behavior. Left: velocity vectors from the ceiling supply, 0 to 0.68 m/s. Center and right: air temperature at the exhaust openings of each room, 294 to 296 K and 294 to 304 K." />
+      <div>
+        <h2 style="font-size: 1.3rem; margin-bottom: 0.8rem">Tools</h2>
+        <ul class="tags"><li>Ansys Fluent</li><li>Porous media</li><li>Structured meshing</li><li>SOLIDWORKS</li><li>AutoCAD</li></ul>
+      </div>
+    </div>
+  </section>
+</ProjectLayout>

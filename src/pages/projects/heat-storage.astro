@@ -1,0 +1,101 @@
+---
+// Heat storage: the model and its validation, then the 20 fin designs (result panel (a) only).
+import ProjectLayout from '../../layouts/ProjectLayout.astro';
+import Figure from '../../components/Figure.astro';
+import Stats from '../../components/Stats.astro';
+import pcmGeometry from '../../assets/img/pcm-geometry.jpg';
+import pcmMesh from '../../assets/img/pcm-mesh.jpg';
+import pcmGrid from '../../assets/img/pcm-grid.jpg';
+import pcmTimestep from '../../assets/img/pcm-timestep.jpg';
+import pcmValidation from '../../assets/img/pcm-validation-full.jpg';
+import pcmContours from '../../assets/img/pcm-contours.jpg';
+import pcmRate from '../../assets/img/pcm-rate-a.jpg';
+---
+<ProjectLayout
+  title="Fin geometry that shortens the charging time of a heat-storage unit"
+  kicker="Thermal energy storage"
+  badges={['J. Energy Storage, 2024', 'Second author']}
+  dek="A parametric CFD study of paraffin melting in a finned, conical heat-storage unit: heat transfer through fluid and solid, coupled to phase change, and validated against an experiment before any design was compared."
+  links={[{ label: 'Paper', href: 'https://doi.org/10.1016/j.est.2024.112471', icon: 'paper' }]}
+  image="/og/heat-storage.png"
+>
+  <section style="padding-top: 0">
+    <div class="container stack">
+      <header class="section-head" style="margin-bottom: 0">
+        <p class="kicker">1 · Model and validation</p>
+        <h2>A phase-change model that tracks a published experiment within 4.1%</h2>
+        <p>Hot water flows down a finned copper tube and melts paraffin in the conical shell around it. Paraffin stores a lot of heat in a small volume but conducts it poorly, so the store charges slowly. Before any fin design was compared, the model had to match an experiment.</p>
+      </header>
+      <div class="split reverse">
+        <Figure images={[{ src: pcmGeometry, alt: "The heat-storage unit from the paper. Top: a cut-away 3D view showing the upper and lower flanges, the inner tube with its fins and the paraffin (PCM) in the conical shell, beside the 2D model's dimensions in millimetres: 270 mm tall, shell radius 28 mm at the bottom and 62 mm at the top. Bottom: a fin on the inner tube wall drawn at the five angles studied, minus 60 to plus 60 degrees." }]}
+          caption="<strong>The unit and its design variables.</strong> Water flows in the inner tube; paraffin fills the shell. Fin length and angle vary. Figure from the paper." />
+        <div class="block">
+          <h3 style="margin-top: 0">The system</h3>
+          <ul>
+            <li>Hot water enters the top of the copper tube at 343 K and 1 m/s; the paraffin starts solid at 298 K, and the outer walls are insulated.</li>
+            <li>The unit is 270 mm tall, with six fins, 2 mm thick, along the tube.</li>
+            <li>20 fin designs: four lengths, 5 to 20 mm, at five angles, −60° to +60°.</li>
+          </ul>
+          <h3>My contribution</h3>
+          <p>As second author, I contributed the Ansys Fluent modeling, the validation against published experimental data and manuscript drafting.</p>
+          <h3>The model</h3>
+          <ul>
+            <li>2D axisymmetric, with enthalpy–porosity melting, natural convection in the liquid and conduction through the tube and fins.</li>
+            <li>A pressure-based coupled solver, with PRESTO pressure interpolation and second-order upwind momentum and energy.</li>
+            <li>A structured mesh in three zones: coarsest in the water, finer in the tube and fins, finest in the paraffin.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="fig-row">
+        <Figure images={[{ src: pcmMesh, alt: 'The structured mesh of the paraffin region beside the tube, with an enlarged view of the fine cells around one fin and the tube wall.' }]}
+          caption="<strong>Mesh.</strong> Structured cells, refined at the fins and the tube wall." />
+        <Figure images={[{ src: pcmValidation, alt: 'Temperature against time at one thermocouple: the simulation follows the published experimental points closely through the rise and stays slightly above them on the plateau.' }]}
+          caption="<strong>Validation.</strong> Simulated temperature (line) against a published thermocouple record (crosses); largest deviation 4.1%." />
+      </div>
+      <Figure max={900} cols={2} images={[
+        { src: pcmGrid, alt: 'Liquid fraction against time on four grids from 50,000 to 120,000 cells; the curves for 100,000 and 120,000 cells overlap.' },
+        { src: pcmTimestep, alt: 'Liquid fraction against time for five time steps, 0.1 to 1 s; the curves at 0.25 seconds and below overlap.' },
+      ]} caption="<strong>Grid and time-step checks.</strong> Liquid fraction over time on four grids (left) and with five time steps (right). The study used 100,000 cells and 0.25 s." />
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="container stack">
+      <header class="section-head" style="margin-bottom: 0">
+        <p class="kicker">2 · Fin designs</p>
+        <h2>Fins that cut a heat store's melting time by 42.6%</h2>
+        <p>Twenty designs, four fin lengths at five angles, run with the validated model. Longer fins melt the paraffin faster, and the angle decides how well the melt can carry heat upward.</p>
+      </header>
+      <div class="split">
+        <Figure images={[{ src: pcmContours, alt: 'Twelve contour plots of the heat-storage unit: four fin lengths in columns and three times, 2, 18 and 34 minutes, in rows. Each shows temperature on the left half and liquid fraction with streamlines on the right half. Longer fins melt more of the material at each time.' }]}
+          caption="<strong>Melting with 5, 10, 15 and 20 mm fins</strong> (left to right, at +30°) after 2, 18 and 34 minutes. Left half of each unit: temperature, 298 to 343 K. Right half: liquid fraction with streamlines, blue solid and red liquid." />
+        <div class="stack" style="gap: 18px">
+          <Stats items={[
+            { value: '42.6%', label: 'shorter melting time', context: '20 mm against 5 mm fins at +30°, simulated' },
+            { value: '76 → 145 W', label: 'heat-storage rate', context: '5 mm fins at −60° to 20 mm fins at +30°' },
+            { value: '39.7 g/min', label: 'highest melting rate', context: '20 mm fins at +30°' },
+          ]} />
+          <div class="block">
+            <h3 style="margin-top: 0">Why the long fins at +30° melt fastest</h3>
+            <p>At first, conduction dominates: a thin layer melts along the tube and fins. As the melt grows, natural convection takes over and the warm liquid rises. Longer fins carry heat closer to the shell but leave less room for that flow, and fins at −30°, −60° and +60° block it. Fins of 20 mm at +30° combine both effects.</p>
+          </div>
+          <div class="idea-box">
+            <p class="kicker">What the fins change</p>
+            <p><strong>Not how much heat the store holds, but how fast it takes it in.</strong> Every design stores between 280 and 303 kJ, while the heat-storage rate nearly doubles, from 76 W to 145 W. Fin design is a charging-power decision.</p>
+          </div>
+        </div>
+      </div>
+      <div class="split reverse">
+        <Figure images={[{ src: pcmRate, alt: 'Melting rate against fin angle for four fin lengths. The rate rises with fin length and peaks near +30 degrees.' }]}
+          caption="<strong>Result.</strong> Melting rate against fin angle (positive: fins tilted up), for each fin length; highest at +30°." />
+        <div class="stack" style="gap: 18px">
+          <div class="idea-box"><p><strong>A validated component model is the first piece of a field-resolved model.</strong></p></div>
+          <div>
+            <h2 style="font-size: 1.3rem; margin-bottom: 0.8rem">Tools</h2>
+            <ul class="tags"><li>Ansys Fluent</li><li>Phase change</li><li>Conjugate heat transfer</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</ProjectLayout>

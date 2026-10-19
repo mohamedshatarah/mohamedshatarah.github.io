@@ -1,0 +1,136 @@
+---
+// Three test storms from Fig. 7 of the stormwater paper (Shatarah, Liu and Li, 2026): CFD and the
+// learned model on one slider, the absolute error beside them. Crops are made by
+// scripts/crop_stormwater_panels.py; the R² values and class shares are the figure's own.
+import { getImage } from 'astro:assets';
+import Icon from './Icon.astro';
+import highCfd from '../assets/stormwater/high-cfd.png';
+import highMl from '../assets/stormwater/high-ml.png';
+import highError from '../assets/stormwater/high-error.png';
+import mediumCfd from '../assets/stormwater/medium-cfd.png';
+import mediumMl from '../assets/stormwater/medium-ml.png';
+import mediumError from '../assets/stormwater/medium-error.png';
+import lowCfd from '../assets/stormwater/low-cfd.png';
+import lowMl from '../assets/stormwater/low-ml.png';
+import lowError from '../assets/stormwater/low-error.png';
+import legendConcentration from '../assets/stormwater/legend-concentration.png';
+import legendError from '../assets/stormwater/legend-error.png';
+
+const storms = [
+  {
+    id: 'high', name: 'High accuracy', r2: '0.99', swatch: '#6aa84f', cfd: highCfd, ml: highMl, error: highError,
+    share: '72.6% of test storms are in this class: concentration R² above 0.8.',
+    note: 'This storm matches closely.',
+  },
+  {
+    id: 'medium', name: 'Medium accuracy', r2: '0.74', swatch: '#f1c232', cfd: mediumCfd, ml: mediumMl, error: mediumError,
+    share: '22.6% of test storms are in this class: concentration R² between 0.4 and 0.8.',
+    note: 'This storm matches partly.',
+  },
+  {
+    id: 'low', name: 'Low accuracy', r2: '0.24', swatch: '#cc0000', cfd: lowCfd, ml: lowMl, error: lowError,
+    share: '4.8% of test storms are in this class: concentration R² below 0.4.',
+    note: 'This storm matches poorly. The poor cases are storms whose concentrations sit orders of magnitude below the rest, which a mean-squared-error loss under-weights.',
+  },
+];
+
+const webp = async (src: ImageMetadata) => (await getImage({ src, format: 'webp', quality: 92 })).src;
+const data = await Promise.all(
+  storms.map(async (s) => ({
+    id: s.id, name: s.name, r2: s.r2, share: s.share, note: s.note,
+    cfd: await webp(s.cfd), ml: await webp(s.ml), error: await webp(s.error),
+  })),
+);
+const first = data[0];
+const concentration = await getImage({ src: legendConcentration, format: 'webp', quality: 92 });
+const errorLegend = await getImage({ src: legendError, format: 'webp', quality: 92 });
+---
+<figure class="figure-block" data-explorer data-storms={JSON.stringify(data)}>
+  <div class="paper explorer">
+    <div class="explorer-tabs" role="tablist" aria-label="Test storm">
+      {storms.map((s, i) => (
+        <button type="button" role="tab" id={`storm-tab-${s.id}`} aria-controls="storm-panel" aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>
+          <span class="swatch" style={`background:${s.swatch}`} aria-hidden="true"></span>
+          {s.name} · R² {s.r2}
+        </button>
+      ))}
+    </div>
+
+    <div class="explorer-grid" id="storm-panel" role="tabpanel" aria-labelledby="storm-tab-high">
+      <div>
+        <p class="panel-label">CFD | learned model, drag to compare</p>
+        <div class="compare">
+          <img data-cfd src={first.cfd} width="331" height="325" alt={`Particle concentration from CFD for the ${first.name.toLowerCase()} test storm.`} />
+          <img data-ml class="over" src={first.ml} width="331" height="325" alt={`The learned model's prediction for the same storm.`} />
+          <input type="range" min="0" max="100" value="50" step="1" aria-label="Divider position between the CFD field (left) and the learned field (right)" />
+          <span class="divider" aria-hidden="true"></span>
+          <span class="handle" aria-hidden="true"><Icon name="arrows" /></span>
+          <span class="side left" aria-hidden="true">CFD</span>
+          <span class="side right" aria-hidden="true">ML</span>
+        </div>
+        <div class="legend"><img src={concentration.src} width="585" height="150" alt="Color scale: relative particle concentration c over c max, from 0 to 1." loading="lazy" /></div>
+      </div>
+      <div class="error-panel">
+        <p class="panel-label">Absolute error</p>
+        <img data-error src={first.error} width="331" height="325" alt={`Absolute error between CFD and the learned model for this storm.`} />
+        <div class="legend"><img src={errorLegend.src} width="585" height="95" alt="Color scale: absolute error, from 0 to 0.1." loading="lazy" /></div>
+      </div>
+      <div class="explorer-facts" aria-live="polite">
+        <p class="panel-label">This test storm</p>
+        <div class="value" data-r2>R² {first.r2}</div>
+        <div class="label"><span data-name>{first.name}</span>, particle concentration</div>
+        <p data-share>{first.share}</p>
+        <p data-note>{first.note}</p>
+        <p>None of these storms was seen in training.</p>
+      </div>
+    </div>
+  </div>
+  <figcaption class="explorer-caption">
+    <strong>The surrogate against CFD on storms it never saw.</strong> Particle concentration in a clipped 3D view of the separator: CFD, surrogate (ML) and absolute error for a high-, a medium- and a low-accuracy test storm. The failure case is shown on purpose. Panels from Fig. 7 of Shatarah, Liu and Li (2026).
+  </figcaption>
+</figure>
+
+<script>
+  type Storm = { id: string; name: string; r2: string; share: string; note: string; cfd: string; ml: string; error: string };
+  for (const root of document.querySelectorAll<HTMLElement>('[data-explorer]')) {
+    const storms: Storm[] = JSON.parse(root.dataset.storms ?? '[]');
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const panel = root.querySelector<HTMLElement>('[role="tabpanel"]')!;
+    const compare = root.querySelector<HTMLElement>('.compare')!;
+    const range = compare.querySelector<HTMLInputElement>('input[type="range"]')!;
+    const cfd = root.querySelector<HTMLImageElement>('[data-cfd]')!;
+    const ml = root.querySelector<HTMLImageElement>('[data-ml]')!;
+    const error = root.querySelector<HTMLImageElement>('[data-error]')!;
+    const text = (key: string) => root.querySelector<HTMLElement>(`[data-${key}]`)!;
+
+    range.addEventListener('input', () => compare.style.setProperty('--pos', `${range.value}%`));
+
+    const select = (index: number, focus = false) => {
+      const storm = storms[index];
+      tabs.forEach((tab, i) => {
+        tab.setAttribute('aria-selected', String(i === index));
+        tab.tabIndex = i === index ? 0 : -1;
+      });
+      if (focus) tabs[index].focus();
+      panel.setAttribute('aria-labelledby', tabs[index].id);
+      cfd.src = storm.cfd;
+      cfd.alt = `Particle concentration from CFD for the ${storm.name.toLowerCase()} test storm.`;
+      ml.src = storm.ml;
+      error.src = storm.error;
+      text('r2').textContent = `R² ${storm.r2}`;
+      text('name').textContent = storm.name;
+      text('share').textContent = storm.share;
+      text('note').textContent = storm.note;
+    };
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => select(i));
+      tab.addEventListener('keydown', (event) => {
+        const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+        if (event.key === 'Home') { event.preventDefault(); select(0, true); }
+        else if (event.key === 'End') { event.preventDefault(); select(tabs.length - 1, true); }
+        else if (step) { event.preventDefault(); select((i + step + tabs.length) % tabs.length, true); }
+      });
+    });
+  }
+</script>

@@ -1,0 +1,20 @@
+---
+// Inline one of the diagram SVGs (src/diagrams/<name>.svg) so the site stylesheet colors it.
+// Its image links (assets/img/x.png, assets/charts/x.png) are pointed at the built files.
+interface Props { name: string; label: string }
+const { name, label } = Astro.props;
+const svgs = import.meta.glob<string>('../diagrams/*.svg', { query: '?raw', import: 'default', eager: true });
+const images = import.meta.glob<{ default: ImageMetadata }>('../assets/img/*.{png,jpg}', { eager: true });
+const raw = svgs[`../diagrams/${name}.svg`];
+if (!raw) throw new Error(`Unknown diagram: ${name}`);
+const byFile = Object.fromEntries(Object.entries(images).map(([path, mod]) => [path.split('/').pop(), mod.default.src]));
+const attr = (text: string) => text.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+const svg = raw
+  .replace(/<!--[\s\S]*?-->/g, '')
+  .replace(/href="assets\/(?:img|charts)\/([^"]+)"/g, (_match, file: string) => {
+    if (!byFile[file]) throw new Error(`Diagram ${name} needs ${file}, which is not in src/assets/img`);
+    return `href="${byFile[file]}"`;
+  })
+  .replace('<svg ', `<svg role="img" aria-label="${attr(label)}" `);
+---
+<Fragment set:html={svg} />

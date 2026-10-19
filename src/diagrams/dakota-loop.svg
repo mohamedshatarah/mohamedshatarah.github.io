@@ -1,0 +1,53 @@
+<svg class="dg" viewBox="0 0 446 250" xmlns="http://www.w3.org/2000/svg">
+  <!-- The Dakota campaign: sample three inputs, build a case for each sample, solve it, send one number back.
+       The dots are the real 5,000 samples (two of the three inputs); the sketch on the right is the model. -->
+  <defs>
+    <marker id="dk-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" class="dg-head"/>
+    </marker>
+  </defs>
+
+  <text x="1" y="13" class="dg-kicker">1 Sample</text>
+  <text x="152" y="13" class="dg-kicker">2 Build</text>
+  <text x="290" y="13" class="dg-kicker">3 Solve</text>
+
+  <!-- 1: the sampling plan -->
+  <rect x="1" y="24" width="124" height="156" rx="3" class="dg-unit"/>
+  <text x="63" y="44" class="dg-title" text-anchor="middle">Dakota</text>
+  <rect x="31" y="56" width="84" height="84" fill="#fff"/>
+  <image href="assets/charts/dakota-samples.png" x="31" y="56" width="84" height="84" preserveAspectRatio="none"/>
+  <path d="M31 56 V140 H115" class="dg-axis" fill="none"/>
+  <text x="73" y="155" class="dg-tiny" text-anchor="middle">inlet gradient</text>
+  <text x="22" y="98" class="dg-tiny" text-anchor="middle" transform="rotate(-90 22 98)">ambient temp.</text>
+  <text x="63" y="172" class="dg-tiny" text-anchor="middle">5,000 samples</text>
+
+  <line x1="129" y1="102" x2="148" y2="102" class="dg-flow" marker-end="url(#dk-arrow)"/>
+
+  <!-- 2: the driver script -->
+  <rect x="152" y="24" width="112" height="156" rx="3" class="dg-unit"/>
+  <text x="208" y="44" class="dg-title" text-anchor="middle">Script</text>
+  <text x="208" y="82" class="dg-small" text-anchor="middle">writes a mesh</text>
+  <text x="208" y="99" class="dg-small" text-anchor="middle">and boundary</text>
+  <text x="208" y="116" class="dg-small" text-anchor="middle">conditions for</text>
+  <text x="208" y="133" class="dg-small" text-anchor="middle">each sample</text>
+
+  <line x1="268" y1="102" x2="286" y2="102" class="dg-flow" marker-end="url(#dk-arrow)"/>
+
+  <!-- 3: the model, with the three sampled inputs marked -->
+  <rect x="290" y="24" width="155" height="156" rx="3" class="dg-unit"/>
+  <text x="367" y="44" class="dg-title" text-anchor="middle">OpenFOAM</text>
+  <text x="367" y="60" class="dg-tiny" text-anchor="middle">heat conduction</text>
+  <rect x="318" y="92" width="98" height="38" class="dg-built"/>
+  <line x1="299" y1="111" x2="316" y2="111" class="dg-flow" marker-end="url(#dk-arrow)"/>
+  <line x1="418" y1="111" x2="435" y2="111" class="dg-flow" marker-end="url(#dk-arrow)"/>
+  <text x="299" y="84" class="dg-tiny">heat in</text>
+  <text x="436" y="84" class="dg-tiny" text-anchor="end">cooling</text>
+  <path d="M318 142 H416 M318 137 V147 M416 137 V147" class="dg-axis" fill="none"/>
+  <text x="367" y="160" class="dg-tiny" text-anchor="middle">length</text>
+
+  <!-- 4: one number back per case -->
+  <path d="M367 184 V210 H63 V186" class="dg-flow" marker-end="url(#dk-arrow)"/>
+  <text x="215" y="202" class="dg-small" text-anchor="middle">one temperature per case, back to Dakota</text>
+
+  <text x="223" y="240" class="dg-label" text-anchor="middle">24 cases at a time · 5,000 cases in about 10 minutes</text>
+</svg>

@@ -1,0 +1,14 @@
+# Build output and dependencies
+dist/
+.astro/
+node_modules/
+
+# Local documents, never part of the public site
+public/files/
+*.pdf
+
+# Editors and operating systems
+.DS_Store
+Thumbs.db
+.vscode/
+*.log

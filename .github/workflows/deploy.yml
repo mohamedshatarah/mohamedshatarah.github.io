@@ -1,0 +1,33 @@
+# Publishes the site to GitHub Pages on every push to main (Astro's official workflow,
+# docs.astro.build/en/guides/deploy/github). Nothing runs until this folder is pushed to a
+# GitHub repository and Settings > Pages > Source is set to "GitHub Actions".
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: withastro/action@v6
+        env:
+          ASTRO_TELEMETRY_DISABLED: 1
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

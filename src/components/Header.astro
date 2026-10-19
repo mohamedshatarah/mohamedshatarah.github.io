@@ -1,0 +1,29 @@
+---
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+
+const path = Astro.url.pathname;
+const links = [
+  { href: '/#projects', label: 'Projects', active: path.startsWith('/projects/') },
+  { href: '/#publications', label: 'Publications', active: false },
+  { href: '/experience/', label: 'Experience', active: path.startsWith('/experience') },
+  { href: '/#about', label: 'About', active: false },
+];
+---
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="/">{site.name}</a>
+    <nav class="nav" aria-label="Main">
+      <ul>
+        {links.map((link) => <li><a href={link.href} aria-current={link.active ? 'page' : undefined}>{link.label}</a></li>)}
+      </ul>
+    </nav>
+    <div class="header-actions">
+      <button class="theme-toggle" type="button" aria-label="Switch theme">
+        <Icon name="sun" class="sun" />
+        <Icon name="moon" class="moon" />
+      </button>
+      <a class="btn btn-small" href={`mailto:${site.email}`}>Email</a>
+    </div>
+  </div>
+</header>

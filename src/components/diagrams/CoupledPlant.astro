@@ -1,0 +1,46 @@
+---
+// The coupled plant as a flow sheet: the biological reactors, and the clarifier drawn as the
+// solids field the neural network predicts. uid keeps the arrow marker's id unique when the diagram
+// appears more than once on a page; decorative hides a repeat from screen readers.
+import clarNn from '../../assets/img/clar-nn-clean.png';
+interface Props { uid?: string; decorative?: boolean }
+const { uid = 'main', decorative = false } = Astro.props;
+const arrow = `cv-arrow-${uid}`;
+const head = `url(#${arrow})`;
+const label =
+  'The plant as a flow sheet. Influent enters five biological reactors, two anoxic and three aerated. Feed solids pass to the clarifier, drawn as the solids field that the neural network predicts. Effluent leaves over the weir, and return sludge flows back to the first reactor.';
+const a11y = decorative ? { 'aria-hidden': 'true' } : { role: 'img', 'aria-label': label };
+---
+<svg class="dg coupled-plant" viewBox="0 0 1000 292" {...a11y} xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id={arrow} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" class="dg-head" />
+    </marker>
+  </defs>
+  <text x="0" y="96" class="cv-small">influent</text>
+  <line x1="0" y1="112" x2="48" y2="112" class="dg-flow" marker-end={head} />
+  <text x="252" y="34" class="cv-title" text-anchor="middle">Biological reactors</text>
+  <text x="252" y="58" class="cv-small" text-anchor="middle">activated-sludge process model</text>
+  <rect x="54" y="76" width="400" height="74" rx="3" class="dg-unit" />
+  <path d="M134 76 V150 M214 76 V150 M294 76 V150 M374 76 V150" class="dg-divider" />
+  <text x="94" y="118" class="cv-tiny" text-anchor="middle">anoxic</text>
+  <text x="174" y="118" class="cv-tiny" text-anchor="middle">anoxic</text>
+  <text x="254" y="108" class="cv-tiny" text-anchor="middle">aerated</text>
+  <text x="334" y="108" class="cv-tiny" text-anchor="middle">aerated</text>
+  <text x="414" y="108" class="cv-tiny" text-anchor="middle">aerated</text>
+  <g class="dg-bubble">
+    <circle cx="234" cy="136" r="2.8" /><circle cx="248" cy="130" r="2.1" /><circle cx="262" cy="138" r="2.8" /><circle cx="276" cy="131" r="2.1" />
+    <circle cx="314" cy="136" r="2.8" /><circle cx="328" cy="130" r="2.1" /><circle cx="342" cy="138" r="2.8" /><circle cx="356" cy="131" r="2.1" />
+    <circle cx="394" cy="136" r="2.8" /><circle cx="408" cy="130" r="2.1" /><circle cx="422" cy="138" r="2.8" /><circle cx="436" cy="131" r="2.1" />
+  </g>
+  <text x="498" y="100" class="cv-small" text-anchor="middle">feed solids</text>
+  <line x1="456" y1="112" x2="538" y2="112" class="dg-flow" marker-end={head} />
+  <text x="704" y="34" class="cv-title" text-anchor="middle">Clarifier: neural network</text>
+  <text x="704" y="58" class="cv-small" text-anchor="middle">full solids field, cell by cell</text>
+  <image href={clarNn.src} x="544" y="72" width="320" height="155.3" />
+  <text x="998" y="72" class="cv-small" text-anchor="end">effluent</text>
+  <line x1="868" y1="84" x2="996" y2="84" class="dg-flow" marker-end={head} />
+  <path d="M556 231 V268 H24 V118" class="dg-flow" marker-end={head} />
+  <circle cx="24" cy="112" r="3.4" class="dg-dot" />
+  <text x="290" y="260" class="cv-small" text-anchor="middle">return sludge</text>
+</svg>

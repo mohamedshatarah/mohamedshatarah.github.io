@@ -1,0 +1,62 @@
+---
+// Reduced-order modeling of measured flow: POD and DMD of 9,000 PIV fields.
+import ProjectLayout from '../../layouts/ProjectLayout.astro';
+import Figure from '../../components/Figure.astro';
+import Stats from '../../components/Stats.astro';
+import podLab from '../../assets/img/pod-lab.jpg';
+---
+<ProjectLayout
+  title="Extracting dominant structures in a turbulent flow from 9,000 PIV measurements"
+  kicker="Reduced-order modeling (ROM) · Measured flow data"
+  badges={['Course project, 2024']}
+  dek="Reduced-order modeling (ROM) describes a flow by a few dominant patterns, found here by proper orthogonal decomposition (POD) of particle image velocimetry (PIV) measured flow in a model separator."
+  image="/og/piv-reduced-order-model.png"
+>
+  <section style="padding-top: 0">
+    <div class="container split reverse">
+      <Figure images={[{ src: podLab, alt: 'A transparent model separator in a dark laboratory, lit green by a laser sheet. Fine particles in the water glow in the lit plane between the inlet and outlet pipes.' }]}
+        caption="<strong>The experiment.</strong> A laser sheet lights fine particles in the water; each pair of camera photos gives one velocity field." />
+      <div class="block">
+        <h2>The problem</h2>
+        <p>The other projects on this site build fast models from simulations. This one starts from 9,000 measured velocity fields of the turbulent flow in a model separator. The fewer patterns describe them, the smaller a fast model can be.</p>
+        <h2 style="margin-top: 1.6rem">What I did</h2>
+        <ul>
+          <li>Cut away the regions under the pipes and mirrored the frames so the flow runs left to right.</li>
+          <li>Ran POD (a singular value decomposition of all 9,000 fields) in Python on the ISAAC-NG HPC cluster, giving the patterns (modes) and their energy.</li>
+          <li>Applied dynamic mode decomposition (DMD) to the same fields and rebuilt the flow from 50, 500 and 5,000 modes.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="container stack">
+      <figure class="figure-block">
+        <div class="paper" style="padding: 14px"><img class="chart" src="/charts/pod-modes.svg" width="1576" height="451" loading="lazy" alt="Five tall panels. The first shows the measured horizontal velocity at one instant: a strong jet crosses the top of the tank from left to right and the water below it barely moves. The other four show POD modes 1, 11, 101 and 401. Mode 1 is one large patch in the jet, mode 11 a short wave along the edge of the jet, and modes 101 and 401 are finer and finer ripples." /></div>
+        <figcaption class="caption"><strong>One measured field, and four of the patterns behind all 9,000.</strong> Left: horizontal velocity at one instant, with the inlet jet at the top. Right: the same component of POD modes 1, 11, 101 and 401, from large structures to ever finer ones. Each panel is scaled to its own peak.</figcaption>
+      </figure>
+      <div class="split">
+        <figure class="figure-block">
+          <div class="paper" style="padding: 14px"><img class="chart" src="/charts/pod-energy.svg" width="1020" height="524" loading="lazy" alt="Two rising curves on a logarithmic axis from 1 to 10,000 modes. The curve for horizontal velocity reaches 50 percent of the energy at about 30 modes and 80 percent at about 250. The curve for vertical velocity reaches them at about 60 and 450 modes." /></div>
+          <figcaption class="caption"><strong>How quickly the energy adds up</strong>, for each velocity component. Curves from my 2024 presentation, labels redrawn.</figcaption>
+        </figure>
+        <div class="stack" style="gap: 18px">
+          <Stats items={[
+            { value: '9,000', label: 'measured velocity fields', context: '50 per second for 3 minutes' },
+            { value: '19,364', label: 'velocity vectors per field', context: 'a 103 × 188 grid after cropping' },
+            { value: '≈ 30 / 60', label: 'modes hold half the energy', context: 'horizontal / vertical velocity' },
+            { value: '≈ 250 / 450', label: 'modes hold 80% of it', context: 'out of 9,000 for each component' },
+          ]} />
+          <div class="strip"><p><strong>Why it matters.</strong> A reduced-order model tracks a few hundred patterns instead of 19,364 vectors per instant. That is what makes it fast.</p></div>
+        </div>
+      </div>
+      <div class="split">
+        <div>
+          <h2 style="font-size: 1.3rem; margin-bottom: 0.8rem">Tools</h2>
+          <ul class="tags"><li>Python</li><li>SciPy</li><li>PyDMD</li><li>ISAAC-NG (HPC)</li></ul>
+        </div>
+        <p class="caption" style="margin: 0">Measurements: Water Infrastructure Laboratory, University of Tennessee (Dr. Haochen Li).</p>
+      </div>
+    </div>
+  </section>
+</ProjectLayout>
